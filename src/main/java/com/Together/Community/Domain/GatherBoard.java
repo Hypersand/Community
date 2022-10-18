@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @Table(name = "GatherBoard")
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 
 public class GatherBoard {
     @Id
@@ -25,9 +27,9 @@ public class GatherBoard {
     private String content;
     private Double latitude;
     private Double longitude;
-    private String address;
-//    @CreationTimestamp
-//    @UpdateTimestamp
+    private String location;
+
+    @CreationTimestamp
     private LocalDateTime created;
     private String userid;
     private String url;
@@ -36,14 +38,14 @@ public class GatherBoard {
 
     @Builder
     public GatherBoard(Long id, String title, String content, Double latitude, Double longitude,
-                       String address, LocalDateTime created, String userid, String url, String urlpassword, Integer statuscode)
+                       String location, LocalDateTime created, String userid, String url, String urlpassword, Integer statuscode)
     {
         this.id = id;
         this.title = title;
         this.content = content;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.address = address;
+        this.location = location;
         this.created = created;
         this.userid = userid;
         this.url = url;
