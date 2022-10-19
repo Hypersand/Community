@@ -28,6 +28,12 @@
       <li class="nav-item" th:classappend="${menu} == 'board'? 'active'">
         <a class="nav-link" href="#" th:href="@{/gatherboard/list}">동행찾기게시판 <span class="sr-only" th:if="${menu} == 'gatherboard'">(current)</span></a>
       </li>
+      <li class="nav-item" th:classappend="${menu} == 'board'? 'active'">
+        <a class="nav-link" href="#" th:href="@{/gatherboard/list}">동행후기게시판 <span class="sr-only" th:if="${menu} == 'gatherboard'">(current)</span></a>
+      </li>
+      <li class="nav-item" th:classappend="${menu} == 'board'? 'active'">
+        <a class="nav-link" href="#" th:href="@{/gatherboard/list}">마이페이지 <span class="sr-only" th:if="${menu} == 'gatherboard'">(current)</span></a>
+      </li>
 
     </ul>
 

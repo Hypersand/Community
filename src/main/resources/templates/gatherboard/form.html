@@ -34,30 +34,54 @@
             <label for="content">내용</label>
             <textarea class="form-control" id="content" rows="3" th:field="*{content}"></textarea>
         </div>
-        <div class = "form-group">
-            <label for="location">위치</label>
-<!--            <button onclick="getLocation()">현재 위치의 위도와 경도</button>-->
-<!--            <p id="myLocation"></p>-->
-            <script>
-                function successHandler(location) {
-                    var message = document.getElementById("message"), html = [];
-                    html.push("<img width='256' height='256' src='http://maps.google.com/maps/api/staticmap?center=", location.coords.latitude, ",", location.coords.longitude, "&markers=size:small|color:blue|", location.coords.latitude, ",", location.coords.longitude, "&zoom=14&size=256x256&sensor=false' />");
-                    html.push("<p>Longitude: ", location.coords.longitude, "</p>");
-                    html.push("<p>Latitude: ", location.coords.latitude, "</p>");
-                    html.push("<p>Accuracy: ", location.coords.accuracy, " meters</p>");
-                    message.innerHTML = html.join("");
-                }
-                function errorHandler(error) {
-                    alert('Attempt to get location failed: ' + error.message);
-                }
-                navigator.geolocation.getCurrentPosition(successHandler, errorHandler);
-            </script>
-            </head>
+
+                        <p id="demo4">버튼을 누르면 좌표가 업데이트 됩니다.</p>
+                        <button type="button" onclick="getLocation4()">좌표</button>
+                        <p id="text1"></p>
+                        <p id="text2">위치가 확인됩니다.</p>
+
+                        <script type="text/javascript" src="httpS://maps.google.com/maps/api/js?key=AIzaSyCyYee9gTMnqoDYBQw1aBnQaXcz1OrcV-I" ></script>
+                        <script>
+                            var x4 = document.getElementById("demo4");
+
+                            function getLocation4() {
+                                if (navigator.geolocation) {
+                                    navigator.geolocation.getCurrentPosition(showPosition4);
+                                } else {
+                                    x4.innerHTML = "이 브라우저는 위치추적이 지원되지 않습니다.";
+                                }
+                            }
+
+                            function showPosition4(position) {
+
+                                x4.innerHTML = "현재 사용자는 위도 " + position.coords.latitude +
+                                    ", 경도 " + position.coords.longitude + "에 위치하고 있습니다.";
+
+                                var forLatlng= document.getElementById("text1");
+                                var forAddress= document.getElementById("text2");
+
+
+                                var geocoder = new google.maps.Geocoder();
+
+                                var latlng = new google.maps.LatLng(position.coords.latitude,
+                                    position.coords.longitude);
+                                geocoder.geocode({'latLng' : latlng}, function(results, status) {
+                                    if (status == google.maps.GeocoderStatus.OK) {
+                                        if (results[1]) {forAddress.innerHTML = results[3].formatted_address;
+                                        }
+                                    } else {
+                                        alert("Geocoder failed due to: " + status);
+                                    }
+                                });
+
+                            }
+                        </script>
+
             <body>
             <div id="message">Location unknown</div>
             </body>
             <textarea class="form-control" id="location" rows="3" th:field="*{location}"></textarea>
-        </div>
+
         <div class="mb-3">
             <label for="url" class="form-label">url주소</label>
             <input type="text" class="form-control" id="url" th:field="*{url}">
