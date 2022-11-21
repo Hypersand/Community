@@ -13,7 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 @Controller
 @RequestMapping("/gatherboard")
@@ -33,8 +34,7 @@ public class GatherBoardController {
     @GetMapping("/list")
     public String list(Model model,@PageableDefault(page=0, size = 5, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable,@RequestParam(required = false, defaultValue = "") String searchKeyword) {
-//        Page<GatherBoard> gatherBoardList = gatherBoardService.gatherBoardList(pageable);
-        Page<GatherBoard> gatherBoardList = gatherBoardService .gatherBoardSearchList(searchKeyword,pageable);
+        Page<GatherBoard> gatherBoardList = gatherBoardService.gatherBoardSearchList1(searchKeyword,pageable);
         int startPage = Math.max(1,gatherBoardList.getPageable().getPageNumber() - 4);
         int endPage = Math.min(gatherBoardList.getTotalPages(), gatherBoardList.getPageable().getPageNumber() + 4);
         model.addAttribute("startPage", startPage);
@@ -57,11 +57,52 @@ public class GatherBoardController {
     }
 
     @PostMapping("/form")
-    public String greetingSubmit(@ModelAttribute GatherBoard gatherBoard) {
+    public String Submit(@ModelAttribute GatherBoard gatherBoard) {
         gatherBoardService.form(gatherBoard);
 
         return "redirect:/gatherboard/list";
     }
+
+    /// 글 상세 조회
+    @GetMapping("/view")
+    public String boardView(Model model, @RequestParam final Long id) {
+        GatherBoard gatherBoard = gatherBoardService.view(id);
+        model.addAttribute("gatherBoard",gatherBoard);
+        return "gatherboard/view";
+    }
+
+    // 게시글 삭제
+    @GetMapping("/delete")
+    public String boardDelete(Long id) {
+        gatherBoardService.boardDelete(id);
+
+        return "redirect:/gatherboard/list";
+    }
+
+    // 게시글 수정
+    @GetMapping("/modify/{id}")
+    public String boardModify(@PathVariable("id") Long id, Model model) {
+
+        model.addAttribute("gatherBoard", gatherBoardService.view(id));
+
+        return "gatherBoard/edit";
+    }
+    @PostMapping("/update/{id}")
+    public String boardUpdate(@PathVariable("id") Long id, GatherBoard board) {
+        GatherBoard boardTemp = gatherBoardService.view(id);
+        boardTemp.setTitle(board.getTitle());
+        boardTemp.setContent(board.getContent());
+        boardTemp.setLatitude(board.getLatitude());
+        boardTemp.setLongitude(board.getLongitude());
+        boardTemp.setLocation(board.getLocation());
+        boardTemp.setUrl(board.getUrl());
+        boardTemp.setUrlpassword(board.getUrlpassword());
+        gatherBoardService.form(boardTemp);
+
+        return "redirect:/gatherboard/list";
+    }
+
+
 
 
 }

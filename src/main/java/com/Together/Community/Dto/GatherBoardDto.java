@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class GatherBoardDto {
     private Long id;
     private String title;
-    private LocalDateTime created;
+    private String created;
     private String userid;
 
     public GatherBoard toEntity() {
@@ -29,7 +29,8 @@ public class GatherBoardDto {
     }
 
     @Builder
-    public GatherBoardDto(Long id, String title, LocalDateTime created, String userid) {
+
+    public GatherBoardDto(Long id, String title, String created, String userid) {
         this.id = id;
         this.title = title;
         this.created = created;

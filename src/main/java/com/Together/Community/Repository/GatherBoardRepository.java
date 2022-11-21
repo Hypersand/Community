@@ -10,4 +10,5 @@ public interface GatherBoardRepository extends JpaRepository<GatherBoard,Long> {
 
     Page<GatherBoard> findByTitleContaining(String searchKeyword, Pageable pageable);
 
+    Page<GatherBoard> findByLocationContaining(String searchKeyword, Pageable pageable);
 }
