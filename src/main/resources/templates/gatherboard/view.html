@@ -1,0 +1,234 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/common :: head('게시판')">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="starter-template.css" th:href="@{/starter-template.css}" rel="stylesheet">
+
+
+    <title>게시판</title>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top" th:replace="fragments/common :: menu('gatherboard')">
+</nav>
+
+<div class="container">
+    <h2>동행을 찾는중</h2>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">작성자</label>
+                <div class="col-sm-10">
+                    <p class="form-control" id="userid" th:text="${gatherBoard.userid}"></p>
+                </div>
+                <label class="col-sm-2 control-label">작성일</label>
+                <div class="col-sm-10">
+                    <p class="form-control" id="created" th:text="${gatherBoard.created}"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">제목</label>
+                <div class="col-sm-10">
+                    <p class="form-control" id="title" th:text="${gatherBoard.title}"></p>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">내용</label>
+                <div class="col-sm-10">
+                    <p class="form-control" id="content" th:text="${gatherBoard.content}"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">위치</label>
+                <div class="col-sm-10">
+                    <p class="form-control" id="location" th:text="${gatherBoard.location}"></p>
+                </div>
+
+
+            </div>
+
+                <meta name="apple-mobile-web-app-capable" content="yes">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+                <div id="map" class="map" style="width:100%; height:400px;"></div>
+
+                    <div>
+                        <button type="button" class="btn btn-secondary" onclick="javascript:getLocation4();">내위치 확인하기</button>
+                        <button type="button" class="btn btn-secondary" onclick="distance1()">동행신청하기</button>
+                    </div>
+
+                <div style="float:right;">
+                <a type ="button" class = "btn btn-secondary" th:href="@{/gatherboard/modify/{id}(id=${gatherBoard.id})}">글수정</a>
+                <a type="button" class="btn btn-secondary" th:href="@{/gatherboard/list}">돌아가기</a>
+                </div>
+
+
+</div>
+
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+    <script src="https://cdn.rawgit.com/bjornharrtell/jsts/gh-pages/1.6.0/jsts.min.js"></script>
+    <script src="httpS://maps.google.com/maps/api/js?key=AIzaSyCyYee9gTMnqoDYBQw1aBnQaXcz1OrcV-I" ></script>
+    <title>OpenLayers example</title>
+    <script type="text/javascript" th:inline="javascript">
+        var data1 = new Object();
+        var x1;
+        var y1;
+        var distance;
+        /*[# th:each="board : ${gatherBoard}"]*/
+        var lat1 = /*[[${board.latitude}]]*/;
+        var lon1 = /*[[${board.longitude}]]*/;
+        var zoom = 12;
+
+
+        // 배경맵 설정
+        var vworldLayer = new ol.layer.Tile({
+            source: new ol.source.XYZ({
+                url: 'http://api.vworld.kr/req/wmts/1.0.0/C3F045F3-5AAE-30DF-8BBF-E9DCA20CF104/Base/{z}/{y}/{x}.png'
+            })
+        });
+
+        var features = [];
+
+        var feature= new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([new Number(lon1),new Number(lat1)]))
+        });
+
+        var style = new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 6,
+                stroke: new ol.style.Stroke({
+                    color: [255, 255, 0, 0],
+                }),
+                fill: new ol.style.Fill({
+                    color: [255, 255, 0, 0],
+                })
+            })
+        })
+
+        feature.setStyle(style)
+
+        features[0] = feature
+
+        var bufferFeature = new ol.Feature({});
+
+        var parser = new jsts.io.OL3Parser();
+
+        var jstsGeom = parser.read(feature.getGeometry());
+        var buffered = jstsGeom.buffer(5000);
+        bufferFeature.setGeometry(parser.write(buffered));
+
+        features[1] = bufferFeature
+
+        var source = new ol.source.Vector({
+            features: features,
+        })
+
+        var pointLayer = new ol.layer.Vector({
+            source: source
+        })
+
+        var markerLayer;
+        var markerSource = new ol.source.Vector();
+
+        var map = new ol.Map({
+            layers: [vworldLayer, pointLayer],
+            target: "map",
+            view: new ol.View({
+                center: ol.proj.fromLonLat([new Number(lon1),new Number(lat1)]),
+                zoom: zoom,
+            }),
+        })
+
+        function getLocation4() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition4);
+
+            } else {
+                x4.innerHTML = "이 브라우저는 위치추적이 지원되지 않습니다.";
+            }
+        }
+        function showPosition4(position) {
+
+            data1.lat = position.coords.latitude;
+            data1.lon = position.coords.longitude;
+            x1 = position.coords.latitude;
+            y1 = position.coords.longitude;
+
+            var feature1= new ol.Feature({
+                geometry: new ol.geom.Point(ol.proj.fromLonLat([new Number(data1.lon),new Number(data1.lat)]))
+            });
+            markerSource.addFeature(feature1);
+
+            var markerStyle = new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 6,
+                    stroke: new ol.style.Stroke({
+                        color: "#fff",
+                    }),
+                    fill: new ol.style.Fill({
+                        color: "#77afd5"
+                    })
+                })
+            })
+            markerLayer = new ol.layer.Vector({
+                source: markerSource, //마커 feacture들
+                style: markerStyle //마커 스타일
+            });
+
+            map.addLayer(markerLayer);
+        }
+
+        function distance1() {
+
+            var radius = 6371; // 지구 반지름(km)
+            var toRadian = Math.PI / 180;
+
+            var deltaLatitude = Math.abs(x1 - lat1) * toRadian;
+            var deltaLongitude = Math.abs(y1 - lon1) * toRadian;
+
+            var sinDeltaLat = Math.sin(deltaLatitude / 2);
+            var sinDeltaLng = Math.sin(deltaLongitude / 2);
+            var squareRoot = Math.sqrt(sinDeltaLat * sinDeltaLat + Math.cos(x1 * toRadian) * Math.cos(lat1 * toRadian) * sinDeltaLng * sinDeltaLng);
+            distance = 2 * radius * Math.asin(squareRoot);
+
+            if(distance>5) {
+                alert("동행신청할 수 없는 거리입니다.");
+            }
+            else if(distance!==0&&distance<5){
+                var up = confirm("동행신청할 수 있는 거리입니다. 신청하시겠습니까??");
+                if (up) {
+                    alert("동행이 신청되었습니다.");
+                }
+                else {
+                    alert("동행신청을 취소하셨습니다.");
+                }
+            }
+            return distance;
+        }
+        /*[/]*/
+    </script>
+</div>
+</body>
+</html>

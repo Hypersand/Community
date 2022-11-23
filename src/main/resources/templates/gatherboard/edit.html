@@ -1,0 +1,128 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/common :: head('게시판')">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="starter-template.css" th:href="@{/starter-template.css}" rel="stylesheet">
+
+    <title>게시판</title>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top" th:replace="fragments/common :: menu('gatherboard')">
+</nav>
+
+<div class="container">
+    <h2>동행찾기 수정</h2>
+    <form    th:action="@{/gatherboard/update/{id}(id = ${gatherBoard.id})}" method = "post">
+        <div class="form-group">
+            <label for="userid">작성자</label>
+                <p class="form-control" id="userid" th:text="${gatherBoard.userid}"></p>
+        </div>
+
+        <div class = "form-group">
+            <label for="title">제목</label>
+            <input type="text" class="form-control" id="title" th:value="${gatherBoard.title}" th:field="${gatherBoard.title}">
+        </div>
+        <div class = "form-group">
+            <label for="content">내용</label>
+            <input type="text" class="form-control" id="content" th:value="${gatherBoard.content}" th:field="${gatherBoard.content}">
+
+        </div>
+        <div>
+            <p id="demo4">위치 수정 버튼</p>
+            <button type="button" onclick="getLocation4()">나의 현재 위치</button>
+        </div>
+
+        <div>
+            <textarea class="form-control" id="text1" rows="1" style=display:none th:value="${gatherBoard.latitude}" th:field="${gatherBoard.latitude}"></textarea>
+        </div>
+
+        <div>
+            <textarea class="form-control" id="text2" rows="1" style=display:none th:value="${gatherBoard.longitude}" th:field="${gatherBoard.longitude}"></textarea>
+        </div>
+
+        <div>
+            <label>위치</label>
+            <input type="text" class="form-control" id="text3" th:value="${gatherBoard.location}" th:field="${gatherBoard.location}">
+        </div>
+
+        <script type="text/javascript" src="httpS://maps.google.com/maps/api/js?key=AIzaSyCyYee9gTMnqoDYBQw1aBnQaXcz1OrcV-I" ></script>
+        <script th:inline="javascript">
+            var gb = [[${gatherboard}]];
+            var x4 = document.getElementById("demo4");
+
+            function getLocation4() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition4);
+
+
+                } else {
+                    x4.innerHTML = "이 브라우저는 위치추적이 지원되지 않습니다.";
+                }
+            }
+            function showPosition4(position) {
+                var forLat= document.getElementById("text1");
+                var forLon= document.getElementById("text2");
+                var forAddress= document.getElementById("text3");
+
+                forLat.innerHTML = position.coords.latitude;
+                forLon.innerHTML = position.coords.longitude;
+
+                // forLatlng.innerHTML = "현재 사용자는 위도 " + position.coords.latitude +
+                //     ", 경도 " + position.coords.longitude + "에 위치하고 있습니다.";
+
+                var geocoder = new google.maps.Geocoder();
+                var latlng = new google.maps.LatLng(position.coords.latitude,
+                    position.coords.longitude);
+
+                geocoder.geocode({'latLng' : latlng}, function(results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        if (results[1]) {forAddress.innerHTML = results[3].formatted_address;
+                        }
+                    } else {
+                        alert("Geocoder failed due to: " + status);
+                    }
+                });
+            }
+        </script>
+
+        <div class="mb-3">
+            <label for="url" class="form-label">url주소</label>
+            <input type="text" class="form-control" id="url" th:value="${gatherBoard.url}" th:field="${gatherBoard.url}">
+        </div>
+        <div class="mb-3">
+            <label for="urlpassword" class="form-label">url비밀번호</label>
+            <input type="text" class="form-control" id="urlpassword" th:value="${gatherBoard.urlpassword}" th:field="${gatherBoard.urlpassword}">
+        </div>
+
+        <div class="text-right">
+<!--            <a type = "button" class="btn btn-secondary" th:href="@{/gatherboard/delete(id=${gatherboard.id})}">삭제</a>-->
+            <a type="button" class="btn btn-secondary" th:href="@{/gatherboard/list}">취소</a>
+            <button type = "submit" class="btn btn-secondary" >수정</button>
+        </div>
+        </div>
+    </form>
+
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
