@@ -55,13 +55,9 @@
 
                         <script type="text/javascript" src="httpS://maps.google.com/maps/api/js?key=AIzaSyCyYee9gTMnqoDYBQw1aBnQaXcz1OrcV-I" ></script>
                         <script th:inline="javascript">
-                            var gb = [[${gatherboard}]];
-                            var x4 = document.getElementById("demo4");
-
                             function getLocation4() {
                                 if (navigator.geolocation) {
                                     navigator.geolocation.getCurrentPosition(showPosition4);
-
 
                                 } else {
                                     x4.innerHTML = "이 브라우저는 위치추적이 지원되지 않습니다.";

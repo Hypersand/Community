@@ -35,7 +35,6 @@
     <tr>
       <th scope="col">글번호</th>
       <th scope="col">제목</th>
-<!--      <th scope="col">작성자</th>-->
       <th scope="col">작성일</th>
       <th scope="col">위치</th>
     </tr>
@@ -44,12 +43,22 @@
     <tr th:each="board : ${gatherBoards}">
       <td th:text="${board.id}">Mark</td>
       <td><a th:text="${board.title}" th:href="@{/gatherboard/view(id=${board.id})}">Mark</a></td>
-<!--      <td th:text="${board.userid}">Mark</td>-->
       <td th:text="${board.created}">Mark</td>
       <Td th:text="${board.location}"></Td>
     </tr>
     </tbody>
+    <script th:inline="javascript">
+      var dataList= new Array();
+      /*[# th:each="board : ${gatherBoards}"]*/
+      var data = new Object();
+      data.id = /*[[${board.id}]]*/;
+      data.lon = /*[[${board.longitude}]]*/;
+      data.lat = /*[[${board.latitude}]]*/;
+      dataList.push(data);
+      /*[/]*/
+    </script>
   </table>
+  <div id="map" class="map" style="width:100%; height:400px;"></div>
   <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center">
       <li class="page-item" th:classappend="${1 == gatherBoards.pageable.pageNumber + 1} ? 'disabled'">
@@ -73,6 +82,7 @@
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
         crossorigin="anonymous"></script>
@@ -82,6 +92,71 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
         crossorigin="anonymous"></script>
-</body>
 
+<link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+<title>OpenLayers example</title>
+<script type="text/javascript">
+  // 배경맵 설정
+  var vworldLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+      url: 'http://api.vworld.kr/req/wmts/1.0.0/C3F045F3-5AAE-30DF-8BBF-E9DCA20CF104/Base/{z}/{y}/{x}.png'
+    })
+  });
+
+  var count = dataList.length; //추후 가져오는 데이터 length로 변경필요
+  var features = new Array(count);
+  for (let i = 0; i < count; i++) {
+    var lon1 = dataList[i].lon;
+    var lat1 = dataList[i].lat;
+    // var coordinates = new Array(); // 가져오는 데이터 위경도 세팅
+
+    var feature= new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.fromLonLat([new Number(lon1),new Number(lat1)]))
+    });
+
+    feature.set("number", dataList[i].id+'')
+
+    features[i] = feature
+  }
+  var source = new ol.source.Vector({
+    features: features,
+  })
+
+  var styleCache = {}
+
+  var points = new ol.layer.Vector({
+    source: source,
+    style: function(feature){
+      var style = new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 10,
+          /*stroke: new ol.style.Stroke({
+            color: "#fff",
+          }),*/
+          fill: new ol.style.Fill({
+            color: "#31f21f"
+          })
+        }),
+        text: new ol.style.Text({
+          text: feature.get("number"),
+          color: "#000000"
+        })
+      })
+      return style;
+    }
+  })
+
+  var map = new ol.Map({
+    layers: [vworldLayer, points],
+    target: "map",
+    view: new ol.View({
+      center: [14209497.501138907, 4328907.375647507],
+      zoom: 7,
+    })
+  });
+
+  map.addLayer(points);
+</script>
+</body>
 </html>
